@@ -5,6 +5,7 @@ using System.ComponentModel;
 using Newtonsoft.Json.Linq;
 
 using ChargeBee.Api;
+using System.Reflection;
 
 namespace ChargeBee.Internal
 {
@@ -57,12 +58,14 @@ namespace ChargeBee.Internal
 			if (String.IsNullOrEmpty(value)) return default(T);
 			
 			Type eType = typeof(T);
-			
+
 			// Handle nullable enum
-			if (eType.IsGenericType)
-				eType = eType.GetGenericArguments()[0];
-			
-			foreach (var fi in eType.GetFields())
+			if (eType.IsConstructedGenericType)
+            {
+                eType = eType.GenericTypeArguments[0];
+            }
+				
+			foreach (var fi in eType.GetTypeInfo().GetFields())
 			{
 				DescriptionAttribute[] attrs = 
 					(DescriptionAttribute[])fi.GetCustomAttributes(typeof(DescriptionAttribute), false);

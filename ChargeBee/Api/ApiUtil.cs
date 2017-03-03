@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.IO;
 using System.Net;
-using System.Web;
 using System.Reflection;
 using System.Text;
 using System.Collections.Generic;
@@ -10,6 +9,8 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 
 using ChargeBee.Exceptions;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace ChargeBee.Api
 {
@@ -23,7 +24,7 @@ namespace ChargeBee.Api
 
             foreach (var path in paths)
             {
-				sb.Append('/').Append(HttpUtility.UrlPathEncode(path));
+				sb.Append('/').Append(WebUtility.UrlEncode(path));
             }
 
             return sb.ToString();
@@ -33,25 +34,19 @@ namespace ChargeBee.Api
         {
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
 			request.Method = Enum.GetName(typeof(HttpMethod), method);
-            request.UserAgent = String.Format("ChargeBee-DotNet-Client v{0} on {1} / {2}",
-                ApiConfig.Version,
-                Environment.Version,
-                Environment.OSVersion);
 
 	     request.Accept = "application/json";
 
 			AddHeaders (request, env);
 			AddCustomHeaders (request, headers);
 
-            request.Timeout = env.ConnectTimeout;
-            request.ReadWriteTimeout = env.ReadTimeout;
 
             return request;
         }
 
 		private static void AddHeaders(HttpWebRequest request, ApiConfig env) {
-			request.Headers.Add(HttpRequestHeader.AcceptCharset, env.Charset);
-			request.Headers.Add(HttpRequestHeader.Authorization, env.AuthValue);
+			request.Headers[HttpRequestHeader.AcceptCharset] = env.Charset;
+			request.Headers[HttpRequestHeader.Authorization] = env.AuthValue;
 		}
 
 		private static void AddCustomHeaders(HttpWebRequest request, Dictionary<string, string> headers) {
@@ -61,14 +56,14 @@ namespace ChargeBee.Api
 		}
 
 		private static void AddHeader(HttpWebRequest request, String headerName, String value) {
-			request.Headers.Add(headerName, value);
+			request.Headers[headerName] =  value;
 		}
 
         private static string SendRequest(HttpWebRequest request, out HttpStatusCode code)
         {
             try
             {
-                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
+                using (HttpWebResponse response = request.GetResponseAsync().Result as HttpWebResponse)
                 using (StreamReader reader = new StreamReader(response.GetResponseStream()))
                 {
                     code = response.StatusCode;
@@ -87,7 +82,7 @@ namespace ChargeBee.Api
 					try {
 						errorJson = JsonConvert.DeserializeObject<Dictionary<string, string>> (content);
 					} catch(JsonException e) {
-						throw new SystemException("Not in JSON format. Probably not a ChargeBee response. \n " + content, e);
+						throw new Exception("Not in JSON format. Probably not a ChargeBee response. \n " + content, e);
 					}
 					string type = "";
 					errorJson.TryGetValue ("type", out type);
@@ -111,16 +106,20 @@ namespace ChargeBee.Api
             return SendRequest(request, out code);
         }
 
-		public static EntityResult Post(string url, Params parameters, Dictionary<string, string> headers, ApiConfig env)
+        public static EntityResult Post(string url, Params parameters, Dictionary<string, string> headers, ApiConfig env)
+        {
+            return PostAsync(url, parameters, headers, env).Result;
+        }
+
+        public static async Task<EntityResult> PostAsync(string url, Params parameters, Dictionary<string, string> headers, ApiConfig env)
         {
 			HttpWebRequest request = GetRequest(url, HttpMethod.POST, headers, env);
             byte[] paramsBytes =
 				Encoding.GetEncoding(env.Charset).GetBytes(parameters.GetQuery(false));
 
-            request.ContentLength = paramsBytes.Length;
             request.ContentType = 
 				String.Format("application/x-www-form-urlencoded;charset={0}",env.Charset);
-            using (Stream stream = request.GetRequestStream())
+            using (Stream stream = await request.GetRequestStreamAsync())
             {
                 stream.Write(paramsBytes, 0, paramsBytes.Length);
 

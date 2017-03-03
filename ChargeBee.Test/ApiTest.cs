@@ -87,12 +87,17 @@ namespace ChargeBee.Test
         }
 
         [Test]
-        [ExpectedException(
-            ExpectedException = typeof(ApiException),
-            ExpectedMessage = "Sorry, we couldn't find that resource")]
         public void TestRetrieveEventNotFound()
         {
-            Event.Retrieve("not_existent_id").Request();
+            try
+            {
+                Event.Retrieve("not_existent_id").Request();
+            }
+            catch (Exception ex)
+            {
+                Assert.IsInstanceOf<ApiException>(ex);
+                Assert.AreEqual("Sorry, we couldn't find that resource", ex.Message);
+            }
         }
 
         [Test]
@@ -178,17 +183,22 @@ namespace ChargeBee.Test
         }
 
         [Test]
-        [ExpectedException(
-            ExpectedException = typeof(ApiException),
-            ExpectedMessage = "Cannot re-activate subscription as there is no active credit card on file")]
         public void TestReactivateSubscriptionError()
         {
-            EntityResult result = Subscription.Create().PlanId("enterprise_half_yearly").Request();
-            Subscription subs = result.Subscription;
-            result = Subscription.Cancel(subs.Id).Request();
-            result = Subscription.Reactivate(subs.Id).
-				TrialEnd((long)(DateTime.Now.AddDays(5)-new DateTime(1970, 1, 1)).TotalSeconds)
-					.Request();
+            try
+            {
+                EntityResult result = Subscription.Create().PlanId("enterprise_half_yearly").Request();
+                Subscription subs = result.Subscription;
+                result = Subscription.Cancel(subs.Id).Request();
+                result = Subscription.Reactivate(subs.Id).
+                    TrialEnd((long)(DateTime.Now.AddDays(5) - new DateTime(1970, 1, 1)).TotalSeconds)
+                        .Request();
+            }
+            catch (Exception ex)
+            {
+                Assert.IsInstanceOf<ApiException>(ex);
+                Assert.AreEqual("Cannot re-activate subscription as there is no active credit card on file", ex.Message);
+            }
         }
 
         [Test]
