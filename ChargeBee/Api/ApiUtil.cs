@@ -9,8 +9,6 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 
 using ChargeBee.Exceptions;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
 
 namespace ChargeBee.Api
 {
@@ -34,12 +32,18 @@ namespace ChargeBee.Api
         {
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
 			request.Method = Enum.GetName(typeof(HttpMethod), method);
+            //request.UserAgent = String.Format("ChargeBee-DotNet-Client v{0} on {1} / {2}",
+            //    ApiConfig.Version,
+            //    Environment.Version,
+            //    Environment.OSVersion);
 
 	     request.Accept = "application/json";
 
 			AddHeaders (request, env);
 			AddCustomHeaders (request, headers);
 
+            //request.Timeout = env.ConnectTimeout;
+            //request.ReadWriteTimeout = env.ReadTimeout;
 
             return request;
         }
@@ -56,7 +60,7 @@ namespace ChargeBee.Api
 		}
 
 		private static void AddHeader(HttpWebRequest request, String headerName, String value) {
-			request.Headers[headerName] =  value;
+			request.Headers[headerName] = value;
 		}
 
         private static string SendRequest(HttpWebRequest request, out HttpStatusCode code)
@@ -82,7 +86,7 @@ namespace ChargeBee.Api
 					try {
 						errorJson = JsonConvert.DeserializeObject<Dictionary<string, string>> (content);
 					} catch(JsonException e) {
-						throw new Exception("Not in JSON format. Probably not a ChargeBee response. \n " + content, e);
+						throw new ArgumentException("Not in JSON format. Probably not a ChargeBee response. \n " + content, e);
 					}
 					string type = "";
 					errorJson.TryGetValue ("type", out type);
@@ -106,20 +110,16 @@ namespace ChargeBee.Api
             return SendRequest(request, out code);
         }
 
-        public static EntityResult Post(string url, Params parameters, Dictionary<string, string> headers, ApiConfig env)
-        {
-            return PostAsync(url, parameters, headers, env).Result;
-        }
-
-        public static async Task<EntityResult> PostAsync(string url, Params parameters, Dictionary<string, string> headers, ApiConfig env)
+		public static EntityResult Post(string url, Params parameters, Dictionary<string, string> headers, ApiConfig env)
         {
 			HttpWebRequest request = GetRequest(url, HttpMethod.POST, headers, env);
             byte[] paramsBytes =
 				Encoding.GetEncoding(env.Charset).GetBytes(parameters.GetQuery(false));
 
+            //request.ContentLength = paramsBytes.Length;
             request.ContentType = 
 				String.Format("application/x-www-form-urlencoded;charset={0}",env.Charset);
-            using (Stream stream = await request.GetRequestStreamAsync())
+            using (Stream stream = request.GetRequestStreamAsync().Result)
             {
                 stream.Write(paramsBytes, 0, paramsBytes.Length);
 

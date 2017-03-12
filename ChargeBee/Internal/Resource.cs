@@ -58,13 +58,11 @@ namespace ChargeBee.Internal
 			if (String.IsNullOrEmpty(value)) return default(T);
 			
 			Type eType = typeof(T);
-
+			
 			// Handle nullable enum
 			if (eType.IsConstructedGenericType)
-            {
-                eType = eType.GenericTypeArguments[0];
-            }
-				
+				eType = eType.GenericTypeArguments[0];
+			
 			foreach (var fi in eType.GetTypeInfo().GetFields())
 			{
 				DescriptionAttribute[] attrs = 
