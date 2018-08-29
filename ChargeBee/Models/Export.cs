@@ -71,7 +71,7 @@ namespace ChargeBee.Models
 			while(this.Status == Export.StatusEnum.InProcess){
 				if(count++ > 50)
 				{
-					throw new SystemException("Export is taking too long");
+					throw new Exception("Export is taking too long");
 				}
 				Thread.Sleep(sleepTime);
 				EntityRequest<Type> req = Retrieve(Id);
