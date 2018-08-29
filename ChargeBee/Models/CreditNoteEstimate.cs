@@ -70,6 +70,14 @@ namespace ChargeBee.Models
         {
             get { return GetResourceList<CreditNoteEstimateLineItemTax>("line_item_taxes"); }
         }
+        public List<CreditNoteEstimateLineItemDiscount> LineItemDiscounts 
+        {
+            get { return GetResourceList<CreditNoteEstimateLineItemDiscount>("line_item_discounts"); }
+        }
+        public int? RoundOffAmount 
+        {
+            get { return GetValue<int?>("round_off_amount", false); }
+        }
         
         #endregion
         
@@ -105,6 +113,10 @@ namespace ChargeBee.Models
 
             public string Id() {
                 return GetValue<string>("id", false);
+            }
+
+            public string SubscriptionId() {
+                return GetValue<string>("subscription_id", false);
             }
 
             public DateTime DateFrom() {
@@ -242,6 +254,39 @@ namespace ChargeBee.Models
 
             public string TaxJurisCode() {
                 return GetValue<string>("tax_juris_code", false);
+            }
+
+        }
+        public class CreditNoteEstimateLineItemDiscount : Resource
+        {
+            public enum DiscountTypeEnum
+            {
+                UnKnown, /*Indicates unexpected value for this enum. You can get this when there is a
+                dotnet-client version incompatibility. We suggest you to upgrade to the latest version */
+                [Description("item_level_coupon")]
+                ItemLevelCoupon,
+                [Description("document_level_coupon")]
+                DocumentLevelCoupon,
+                [Description("promotional_credits")]
+                PromotionalCredits,
+                [Description("prorated_credits")]
+                ProratedCredits,
+            }
+
+            public string LineItemId() {
+                return GetValue<string>("line_item_id", true);
+            }
+
+            public DiscountTypeEnum DiscountType() {
+                return GetEnum<DiscountTypeEnum>("discount_type", true);
+            }
+
+            public string CouponId() {
+                return GetValue<string>("coupon_id", false);
+            }
+
+            public int DiscountAmount() {
+                return GetValue<int>("discount_amount", true);
             }
 
         }

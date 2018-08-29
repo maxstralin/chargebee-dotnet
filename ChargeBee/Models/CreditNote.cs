@@ -29,10 +29,20 @@ namespace ChargeBee.Models
             string url = ApiUtil.BuildUrl("credit_notes", CheckNull(id));
             return new EntityRequest<Type>(url, HttpMethod.GET);
         }
-        public static EntityRequest<Type> Pdf(string id)
+        public static PdfRequest Pdf(string id)
         {
             string url = ApiUtil.BuildUrl("credit_notes", CheckNull(id), "pdf");
-            return new EntityRequest<Type>(url, HttpMethod.POST);
+            return new PdfRequest(url, HttpMethod.POST);
+        }
+        public static RecordRefundRequest RecordRefund(string id)
+        {
+            string url = ApiUtil.BuildUrl("credit_notes", CheckNull(id), "record_refund");
+            return new RecordRefundRequest(url, HttpMethod.POST);
+        }
+        public static VoidCreditNoteRequest VoidCreditNote(string id)
+        {
+            string url = ApiUtil.BuildUrl("credit_notes", CheckNull(id), "void");
+            return new VoidCreditNoteRequest(url, HttpMethod.POST);
         }
         public static CreditNoteListRequest List()
         {
@@ -44,6 +54,11 @@ namespace ChargeBee.Models
         {
             string url = ApiUtil.BuildUrl("customers", CheckNull(id), "credit_notes");
             return new ListRequest(url);
+        }
+        public static DeleteRequest Delete(string id)
+        {
+            string url = ApiUtil.BuildUrl("credit_notes", CheckNull(id), "delete");
+            return new DeleteRequest(url, HttpMethod.POST);
         }
         #endregion
         
@@ -128,6 +143,10 @@ namespace ChargeBee.Models
         {
             get { return GetValue<int>("sub_total", true); }
         }
+        public int? RoundOffAmount 
+        {
+            get { return GetValue<int?>("round_off_amount", false); }
+        }
         public List<CreditNoteLineItem> LineItems 
         {
             get { return GetResourceList<CreditNoteLineItem>("line_items"); }
@@ -135,6 +154,10 @@ namespace ChargeBee.Models
         public List<CreditNoteDiscount> Discounts 
         {
             get { return GetResourceList<CreditNoteDiscount>("discounts"); }
+        }
+        public List<CreditNoteLineItemDiscount> LineItemDiscounts 
+        {
+            get { return GetResourceList<CreditNoteLineItemDiscount>("line_item_discounts"); }
         }
         public List<CreditNoteTax> Taxes 
         {
@@ -177,12 +200,12 @@ namespace ChargeBee.Models
                 m_params.AddOpt("total", total);
                 return this;
             }
-            public CreateRequest Type(TypeEnum type) 
+            public CreateRequest Type(CreditNote.TypeEnum type) 
             {
                 m_params.Add("type", type);
                 return this;
             }
-            public CreateRequest ReasonCode(ReasonCodeEnum reasonCode) 
+            public CreateRequest ReasonCode(CreditNote.ReasonCodeEnum reasonCode) 
             {
                 m_params.Add("reason_code", reasonCode);
                 return this;
@@ -218,6 +241,65 @@ namespace ChargeBee.Models
                 return this;
             }
         }
+        public class PdfRequest : EntityRequest<PdfRequest> 
+        {
+            public PdfRequest(string url, HttpMethod method) 
+                    : base(url, method)
+            {
+            }
+
+            public PdfRequest DispositionType(ChargeBee.Models.Enums.DispositionTypeEnum dispositionType) 
+            {
+                m_params.AddOpt("disposition_type", dispositionType);
+                return this;
+            }
+        }
+        public class RecordRefundRequest : EntityRequest<RecordRefundRequest> 
+        {
+            public RecordRefundRequest(string url, HttpMethod method) 
+                    : base(url, method)
+            {
+            }
+
+            public RecordRefundRequest Comment(string comment) 
+            {
+                m_params.AddOpt("comment", comment);
+                return this;
+            }
+            public RecordRefundRequest TransactionAmount(int transactionAmount) 
+            {
+                m_params.AddOpt("transaction[amount]", transactionAmount);
+                return this;
+            }
+            public RecordRefundRequest TransactionPaymentMethod(ChargeBee.Models.Enums.PaymentMethodEnum transactionPaymentMethod) 
+            {
+                m_params.Add("transaction[payment_method]", transactionPaymentMethod);
+                return this;
+            }
+            public RecordRefundRequest TransactionReferenceNumber(string transactionReferenceNumber) 
+            {
+                m_params.AddOpt("transaction[reference_number]", transactionReferenceNumber);
+                return this;
+            }
+            public RecordRefundRequest TransactionDate(long transactionDate) 
+            {
+                m_params.Add("transaction[date]", transactionDate);
+                return this;
+            }
+        }
+        public class VoidCreditNoteRequest : EntityRequest<VoidCreditNoteRequest> 
+        {
+            public VoidCreditNoteRequest(string url, HttpMethod method) 
+                    : base(url, method)
+            {
+            }
+
+            public VoidCreditNoteRequest Comment(string comment) 
+            {
+                m_params.AddOpt("comment", comment);
+                return this;
+            }
+        }
         public class CreditNoteListRequest : ListRequestBase<CreditNoteListRequest> 
         {
             public CreditNoteListRequest(string url) 
@@ -246,17 +328,17 @@ namespace ChargeBee.Models
             {
                 return new StringFilter<CreditNoteListRequest>("reference_invoice_id", this).SupportsMultiOperators(true);        
             }
-            public EnumFilter<TypeEnum, CreditNoteListRequest> Type() 
+            public EnumFilter<CreditNote.TypeEnum, CreditNoteListRequest> Type() 
             {
-                return new EnumFilter<TypeEnum, CreditNoteListRequest>("type", this);        
+                return new EnumFilter<CreditNote.TypeEnum, CreditNoteListRequest>("type", this);        
             }
-            public EnumFilter<ReasonCodeEnum, CreditNoteListRequest> ReasonCode() 
+            public EnumFilter<CreditNote.ReasonCodeEnum, CreditNoteListRequest> ReasonCode() 
             {
-                return new EnumFilter<ReasonCodeEnum, CreditNoteListRequest>("reason_code", this);        
+                return new EnumFilter<CreditNote.ReasonCodeEnum, CreditNoteListRequest>("reason_code", this);        
             }
-            public EnumFilter<StatusEnum, CreditNoteListRequest> Status() 
+            public EnumFilter<CreditNote.StatusEnum, CreditNoteListRequest> Status() 
             {
-                return new EnumFilter<StatusEnum, CreditNoteListRequest>("status", this);        
+                return new EnumFilter<CreditNote.StatusEnum, CreditNoteListRequest>("status", this);        
             }
             public TimestampFilter<CreditNoteListRequest> Date() 
             {
@@ -266,9 +348,9 @@ namespace ChargeBee.Models
             {
                 return new NumberFilter<int, CreditNoteListRequest>("total", this);        
             }
-            public EnumFilter<PriceTypeEnum, CreditNoteListRequest> PriceType() 
+            public EnumFilter<ChargeBee.Models.Enums.PriceTypeEnum, CreditNoteListRequest> PriceType() 
             {
-                return new EnumFilter<PriceTypeEnum, CreditNoteListRequest>("price_type", this);        
+                return new EnumFilter<ChargeBee.Models.Enums.PriceTypeEnum, CreditNoteListRequest>("price_type", this);        
             }
             public NumberFilter<int, CreditNoteListRequest> AmountAllocated() 
             {
@@ -292,6 +374,19 @@ namespace ChargeBee.Models
             }
             public CreditNoteListRequest SortByDate(SortOrderEnum order) {
                 m_params.AddOpt("sort_by["+order.ToString().ToLower()+"]","date");
+                return this;
+            }
+        }
+        public class DeleteRequest : EntityRequest<DeleteRequest> 
+        {
+            public DeleteRequest(string url, HttpMethod method) 
+                    : base(url, method)
+            {
+            }
+
+            public DeleteRequest Comment(string comment) 
+            {
+                m_params.AddOpt("comment", comment);
                 return this;
             }
         }
@@ -319,6 +414,8 @@ namespace ChargeBee.Models
             SubscriptionChange,
             [Description("subscription_cancellation")]
             SubscriptionCancellation,
+            [Description("subscription_pause")]
+            SubscriptionPause,
             [Description("chargeback")]
             Chargeback,
             [Description("product_unsatisfactory")]
@@ -333,6 +430,8 @@ namespace ChargeBee.Models
             Waiver,
             [Description("other")]
             Other,
+            [Description("fraudulent")]
+            Fraudulent,
 
         }
         public enum StatusEnum
@@ -370,6 +469,10 @@ namespace ChargeBee.Models
 
             public string Id() {
                 return GetValue<string>("id", false);
+            }
+
+            public string SubscriptionId() {
+                return GetValue<string>("subscription_id", false);
             }
 
             public DateTime DateFrom() {
@@ -459,6 +562,39 @@ namespace ChargeBee.Models
 
             public string EntityId() {
                 return GetValue<string>("entity_id", false);
+            }
+
+        }
+        public class CreditNoteLineItemDiscount : Resource
+        {
+            public enum DiscountTypeEnum
+            {
+                UnKnown, /*Indicates unexpected value for this enum. You can get this when there is a
+                dotnet-client version incompatibility. We suggest you to upgrade to the latest version */
+                [Description("item_level_coupon")]
+                ItemLevelCoupon,
+                [Description("document_level_coupon")]
+                DocumentLevelCoupon,
+                [Description("promotional_credits")]
+                PromotionalCredits,
+                [Description("prorated_credits")]
+                ProratedCredits,
+            }
+
+            public string LineItemId() {
+                return GetValue<string>("line_item_id", true);
+            }
+
+            public DiscountTypeEnum DiscountType() {
+                return GetEnum<DiscountTypeEnum>("discount_type", true);
+            }
+
+            public string CouponId() {
+                return GetValue<string>("coupon_id", false);
+            }
+
+            public int DiscountAmount() {
+                return GetValue<int>("discount_amount", true);
             }
 
         }

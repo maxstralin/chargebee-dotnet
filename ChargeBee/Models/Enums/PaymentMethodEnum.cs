@@ -33,6 +33,21 @@ namespace ChargeBee.Models.Enums
         [Description("direct_debit")]
          DirectDebit,
 
+        [Description("alipay")]
+         Alipay,
+
+        [Description("unionpay")]
+         Unionpay,
+
+        [Description("apple_pay")]
+         ApplePay,
+
+        [Description("wechat_pay")]
+         WechatPay,
+
+        [Description("ach_credit")]
+         AchCredit,
+
         [Description("other")]
          Other,
 

@@ -36,6 +36,24 @@ namespace ChargeBee.Models.Enums
         [Description("coupon_deleted")]
          CouponDeleted,
 
+        [Description("coupon_set_created")]
+         CouponSetCreated,
+
+        [Description("coupon_set_updated")]
+         CouponSetUpdated,
+
+        [Description("coupon_set_deleted")]
+         CouponSetDeleted,
+
+        [Description("coupon_codes_added")]
+         CouponCodesAdded,
+
+        [Description("coupon_codes_deleted")]
+         CouponCodesDeleted,
+
+        [Description("coupon_codes_updated")]
+         CouponCodesUpdated,
+
         [Description("customer_created")]
          CustomerCreated,
 
@@ -50,6 +68,12 @@ namespace ChargeBee.Models.Enums
 
         [Description("customer_moved_in")]
          CustomerMovedIn,
+
+        [Description("promotional_credits_added")]
+         PromotionalCreditsAdded,
+
+        [Description("promotional_credits_deducted")]
+         PromotionalCreditsDeducted,
 
         [Description("subscription_created")]
          SubscriptionCreated,
@@ -84,14 +108,41 @@ namespace ChargeBee.Models.Enums
         [Description("subscription_scheduled_cancellation_removed")]
          SubscriptionScheduledCancellationRemoved,
 
+        [Description("subscription_changes_scheduled")]
+         SubscriptionChangesScheduled,
+
+        [Description("subscription_scheduled_changes_removed")]
+         SubscriptionScheduledChangesRemoved,
+
         [Description("subscription_shipping_address_updated")]
          SubscriptionShippingAddressUpdated,
 
         [Description("subscription_deleted")]
          SubscriptionDeleted,
 
+        [Description("subscription_paused")]
+         SubscriptionPaused,
+
+        [Description("subscription_pause_scheduled")]
+         SubscriptionPauseScheduled,
+
+        [Description("subscription_scheduled_pause_removed")]
+         SubscriptionScheduledPauseRemoved,
+
+        [Description("subscription_resumed")]
+         SubscriptionResumed,
+
+        [Description("subscription_resumption_scheduled")]
+         SubscriptionResumptionScheduled,
+
+        [Description("subscription_scheduled_resumption_removed")]
+         SubscriptionScheduledResumptionRemoved,
+
         [Description("pending_invoice_created")]
          PendingInvoiceCreated,
+
+        [Description("pending_invoice_updated")]
+         PendingInvoiceUpdated,
 
         [Description("invoice_generated")]
          InvoiceGenerated,
@@ -155,6 +206,36 @@ namespace ChargeBee.Models.Enums
 
         [Description("card_deleted")]
          CardDeleted,
+
+        [Description("payment_source_added")]
+         PaymentSourceAdded,
+
+        [Description("payment_source_updated")]
+         PaymentSourceUpdated,
+
+        [Description("payment_source_deleted")]
+         PaymentSourceDeleted,
+
+        [Description("virtual_bank_account_added")]
+         VirtualBankAccountAdded,
+
+        [Description("virtual_bank_account_updated")]
+         VirtualBankAccountUpdated,
+
+        [Description("virtual_bank_account_deleted")]
+         VirtualBankAccountDeleted,
+
+        [Description("unbilled_charges_created")]
+         UnbilledChargesCreated,
+
+        [Description("unbilled_charges_voided")]
+         UnbilledChargesVoided,
+
+        [Description("unbilled_charges_deleted")]
+         UnbilledChargesDeleted,
+
+        [Description("unbilled_charges_invoiced")]
+         UnbilledChargesInvoiced,
 
     }
 }

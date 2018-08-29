@@ -47,9 +47,9 @@ namespace ChargeBee.Models
         #endregion
         
         #region Properties
-        public string CustomerId 
+        public string PaymentSourceId 
         {
-            get { return GetValue<string>("customer_id", true); }
+            get { return GetValue<string>("payment_source_id", true); }
         }
         public StatusEnum Status 
         {
@@ -95,6 +95,10 @@ namespace ChargeBee.Models
         {
             get { return GetValue<int>("expiry_year", true); }
         }
+        public string IssuingCountry 
+        {
+            get { return GetValue<string>("issuing_country", false); }
+        }
         public string BillingAddr1 
         {
             get { return GetValue<string>("billing_addr1", false); }
@@ -127,6 +131,10 @@ namespace ChargeBee.Models
         {
             get { return GetValue<string>("ip_address", false); }
         }
+        public string CustomerId 
+        {
+            get { return GetValue<string>("customer_id", true); }
+        }
         public string MaskedNumber 
         {
             get { return GetValue<string>("masked_number", false); }
@@ -143,7 +151,7 @@ namespace ChargeBee.Models
             }
 
             [Obsolete]
-            public UpdateCardForCustomerRequest Gateway(GatewayEnum gateway) 
+            public UpdateCardForCustomerRequest Gateway(ChargeBee.Models.Enums.GatewayEnum gateway) 
             {
                 m_params.AddOpt("gateway", gateway);
                 return this;
@@ -244,7 +252,7 @@ namespace ChargeBee.Models
             }
 
             [Obsolete]
-            public SwitchGatewayForCustomerRequest Gateway(GatewayEnum gateway) 
+            public SwitchGatewayForCustomerRequest Gateway(ChargeBee.Models.Enums.GatewayEnum gateway) 
             {
                 m_params.AddOpt("gateway", gateway);
                 return this;

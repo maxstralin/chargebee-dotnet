@@ -41,13 +41,29 @@ namespace ChargeBee.Internal
         {
             get {  return GetResource<Customer>("customer"); }
         }
-        public Card Card
+        public Contact Contact
         {
-            get {  return GetResource<Card>("card"); }
+            get {  return GetResource<Contact>("contact"); }
+        }
+        public PaymentSource PaymentSource
+        {
+            get {  return GetResource<PaymentSource>("payment_source"); }
         }
         public ThirdPartyPaymentMethod ThirdPartyPaymentMethod
         {
             get {  return GetResource<ThirdPartyPaymentMethod>("third_party_payment_method"); }
+        }
+        public VirtualBankAccount VirtualBankAccount
+        {
+            get {  return GetResource<VirtualBankAccount>("virtual_bank_account"); }
+        }
+        public Card Card
+        {
+            get {  return GetResource<Card>("card"); }
+        }
+        public PromotionalCredit PromotionalCredit
+        {
+            get {  return GetResource<PromotionalCredit>("promotional_credit"); }
         }
         public Invoice Invoice
         {
@@ -56,6 +72,10 @@ namespace ChargeBee.Internal
         public CreditNote CreditNote
         {
             get {  return GetResource<CreditNote>("credit_note"); }
+        }
+        public UnbilledCharge UnbilledCharge
+        {
+            get {  return GetResource<UnbilledCharge>("unbilled_charge"); }
         }
         public Order Order
         {
@@ -84,6 +104,10 @@ namespace ChargeBee.Internal
         public Coupon Coupon
         {
             get {  return GetResource<Coupon>("coupon"); }
+        }
+        public CouponSet CouponSet
+        {
+            get {  return GetResource<CouponSet>("coupon_set"); }
         }
         public CouponCode CouponCode
         {
@@ -117,10 +141,28 @@ namespace ChargeBee.Internal
         {
             get {  return GetResource<ResourceMigration>("resource_migration"); }
         }
+        public TimeMachine TimeMachine
+        {
+            get {  return GetResource<TimeMachine>("time_machine"); }
+        }
+        public Export Export
+        {
+            get {  return GetResource<Export>("export"); }
+        }
+
+        public List<UnbilledCharge> UnbilledCharges
+        {
+            get {  return (List<UnbilledCharge>)GetResourceList<UnbilledCharge>("unbilled_charges", "unbilled_charge"); }
+        }
 
         public List<CreditNote> CreditNotes
         {
             get {  return (List<CreditNote>)GetResourceList<CreditNote>("credit_notes", "credit_note"); }
+        }
+
+        public List<Invoice> Invoices
+        {
+            get {  return (List<Invoice>)GetResourceList<Invoice>("invoices", "invoice"); }
         }
 
 

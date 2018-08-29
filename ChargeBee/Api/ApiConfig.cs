@@ -7,7 +7,7 @@ namespace ChargeBee.Api
     {
 		public static string DomainSuffix = "chargebee.com";
 		public static string Proto = "https";
-		public static string Version = "2.2.7";
+		public static string Version = "2.6.0";
 		public static readonly string API_VERSION = "v2";
 
 		public string ApiKey { get; set; }
@@ -66,7 +66,7 @@ namespace ChargeBee.Api
             get
             {
                 if (m_instance == null)
-                    throw new InvalidOperationException("Not yet configured!");
+                    throw new ApplicationException("Not yet configured!");
 
                 return m_instance;
             }

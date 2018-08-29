@@ -44,6 +44,16 @@ namespace ChargeBee.Models
             string url = ApiUtil.BuildUrl("invoices", "import_invoice");
             return new ImportInvoiceRequest(url, HttpMethod.POST);
         }
+        public static ApplyPaymentsRequest ApplyPayments(string id)
+        {
+            string url = ApiUtil.BuildUrl("invoices", CheckNull(id), "apply_payments");
+            return new ApplyPaymentsRequest(url, HttpMethod.POST);
+        }
+        public static ApplyCreditsRequest ApplyCredits(string id)
+        {
+            string url = ApiUtil.BuildUrl("invoices", CheckNull(id), "apply_credits");
+            return new ApplyCreditsRequest(url, HttpMethod.POST);
+        }
         public static InvoiceListRequest List()
         {
             string url = ApiUtil.BuildUrl("invoices");
@@ -66,10 +76,10 @@ namespace ChargeBee.Models
             string url = ApiUtil.BuildUrl("invoices", CheckNull(id));
             return new EntityRequest<Type>(url, HttpMethod.GET);
         }
-        public static EntityRequest<Type> Pdf(string id)
+        public static PdfRequest Pdf(string id)
         {
             string url = ApiUtil.BuildUrl("invoices", CheckNull(id), "pdf");
-            return new EntityRequest<Type>(url, HttpMethod.POST);
+            return new PdfRequest(url, HttpMethod.POST);
         }
         public static AddChargeRequest AddCharge(string id)
         {
@@ -106,6 +116,16 @@ namespace ChargeBee.Models
             string url = ApiUtil.BuildUrl("invoices", CheckNull(id), "record_refund");
             return new RecordRefundRequest(url, HttpMethod.POST);
         }
+        public static RemovePaymentRequest RemovePayment(string id)
+        {
+            string url = ApiUtil.BuildUrl("invoices", CheckNull(id), "remove_payment");
+            return new RemovePaymentRequest(url, HttpMethod.POST);
+        }
+        public static RemoveCreditNoteRequest RemoveCreditNote(string id)
+        {
+            string url = ApiUtil.BuildUrl("invoices", CheckNull(id), "remove_credit_note");
+            return new RemoveCreditNoteRequest(url, HttpMethod.POST);
+        }
         public static VoidInvoiceRequest VoidInvoice(string id)
         {
             string url = ApiUtil.BuildUrl("invoices", CheckNull(id), "void");
@@ -120,6 +140,11 @@ namespace ChargeBee.Models
         {
             string url = ApiUtil.BuildUrl("invoices", CheckNull(id), "delete");
             return new DeleteRequest(url, HttpMethod.POST);
+        }
+        public static UpdateDetailsRequest UpdateDetails(string id)
+        {
+            string url = ApiUtil.BuildUrl("invoices", CheckNull(id), "update_details");
+            return new UpdateDetailsRequest(url, HttpMethod.POST);
         }
         #endregion
         
@@ -232,6 +257,22 @@ namespace ChargeBee.Models
         {
             get { return GetValue<bool?>("first_invoice", false); }
         }
+        public bool? HasAdvanceCharges 
+        {
+            get { return GetValue<bool?>("has_advance_charges", false); }
+        }
+        public DateTime? ExpectedPaymentDate 
+        {
+            get { return GetDateTime("expected_payment_date", false); }
+        }
+        public int? AmountToCollect 
+        {
+            get { return GetValue<int?>("amount_to_collect", false); }
+        }
+        public int? RoundOffAmount 
+        {
+            get { return GetValue<int?>("round_off_amount", false); }
+        }
         public List<InvoiceLineItem> LineItems 
         {
             get { return GetResourceList<InvoiceLineItem>("line_items"); }
@@ -239,6 +280,10 @@ namespace ChargeBee.Models
         public List<InvoiceDiscount> Discounts 
         {
             get { return GetResourceList<InvoiceDiscount>("discounts"); }
+        }
+        public List<InvoiceLineItemDiscount> LineItemDiscounts 
+        {
+            get { return GetResourceList<InvoiceLineItemDiscount>("line_item_discounts"); }
         }
         public List<InvoiceTax> Taxes 
         {
@@ -315,6 +360,11 @@ namespace ChargeBee.Models
                 m_params.AddOpt("po_number", poNumber);
                 return this;
             }
+            public CreateRequest PaymentSourceId(string paymentSourceId) 
+            {
+                m_params.AddOpt("payment_source_id", paymentSourceId);
+                return this;
+            }
             public CreateRequest ShippingAddressFirstName(string shippingAddressFirstName) 
             {
                 m_params.AddOpt("shipping_address[first_name]", shippingAddressFirstName);
@@ -380,7 +430,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("shipping_address[country]", shippingAddressCountry);
                 return this;
             }
-            public CreateRequest ShippingAddressValidationStatus(ValidationStatusEnum shippingAddressValidationStatus) 
+            public CreateRequest ShippingAddressValidationStatus(ChargeBee.Models.Enums.ValidationStatusEnum shippingAddressValidationStatus) 
             {
                 m_params.AddOpt("shipping_address[validation_status]", shippingAddressValidationStatus);
                 return this;
@@ -453,6 +503,11 @@ namespace ChargeBee.Models
                 m_params.AddOpt("po_number", poNumber);
                 return this;
             }
+            public ChargeRequest PaymentSourceId(string paymentSourceId) 
+            {
+                m_params.AddOpt("payment_source_id", paymentSourceId);
+                return this;
+            }
         }
         public class ChargeAddonRequest : EntityRequest<ChargeAddonRequest> 
         {
@@ -496,6 +551,11 @@ namespace ChargeBee.Models
                 m_params.AddOpt("po_number", poNumber);
                 return this;
             }
+            public ChargeAddonRequest PaymentSourceId(string paymentSourceId) 
+            {
+                m_params.AddOpt("payment_source_id", paymentSourceId);
+                return this;
+            }
         }
         public class ImportInvoiceRequest : EntityRequest<ImportInvoiceRequest> 
         {
@@ -529,12 +589,12 @@ namespace ChargeBee.Models
                 m_params.AddOpt("po_number", poNumber);
                 return this;
             }
-            public ImportInvoiceRequest PriceType(PriceTypeEnum priceType) 
+            public ImportInvoiceRequest PriceType(ChargeBee.Models.Enums.PriceTypeEnum priceType) 
             {
                 m_params.AddOpt("price_type", priceType);
                 return this;
             }
-            public ImportInvoiceRequest TaxOverrideReason(TaxOverrideReasonEnum taxOverrideReason) 
+            public ImportInvoiceRequest TaxOverrideReason(ChargeBee.Models.Enums.TaxOverrideReasonEnum taxOverrideReason) 
             {
                 m_params.AddOpt("tax_override_reason", taxOverrideReason);
                 return this;
@@ -559,7 +619,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("round_off", roundOff);
                 return this;
             }
-            public ImportInvoiceRequest Status(StatusEnum status) 
+            public ImportInvoiceRequest Status(Invoice.StatusEnum status) 
             {
                 m_params.AddOpt("status", status);
                 return this;
@@ -644,7 +704,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("billing_address[country]", billingAddressCountry);
                 return this;
             }
-            public ImportInvoiceRequest BillingAddressValidationStatus(ValidationStatusEnum billingAddressValidationStatus) 
+            public ImportInvoiceRequest BillingAddressValidationStatus(ChargeBee.Models.Enums.ValidationStatusEnum billingAddressValidationStatus) 
             {
                 m_params.AddOpt("billing_address[validation_status]", billingAddressValidationStatus);
                 return this;
@@ -714,7 +774,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("shipping_address[country]", shippingAddressCountry);
                 return this;
             }
-            public ImportInvoiceRequest ShippingAddressValidationStatus(ValidationStatusEnum shippingAddressValidationStatus) 
+            public ImportInvoiceRequest ShippingAddressValidationStatus(ChargeBee.Models.Enums.ValidationStatusEnum shippingAddressValidationStatus) 
             {
                 m_params.AddOpt("shipping_address[validation_status]", shippingAddressValidationStatus);
                 return this;
@@ -749,7 +809,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("line_items[amount][" + index + "]", lineItemAmount);
                 return this;
             }
-			public ImportInvoiceRequest LineItemEntityType(int index, InvoiceLineItem.EntityTypeEnum lineItemEntityType) 
+            public ImportInvoiceRequest LineItemEntityType(int index, InvoiceLineItem.EntityTypeEnum lineItemEntityType) 
             {
                 m_params.AddOpt("line_items[entity_type][" + index + "]", lineItemEntityType);
                 return this;
@@ -819,7 +879,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("line_items[tax4_amount][" + index + "]", lineItemTax4Amount);
                 return this;
             }
-			public ImportInvoiceRequest DiscountEntityType(int index, InvoiceDiscount.EntityTypeEnum discountEntityType) 
+            public ImportInvoiceRequest DiscountEntityType(int index, InvoiceDiscount.EntityTypeEnum discountEntityType) 
             {
                 m_params.Add("discounts[entity_type][" + index + "]", discountEntityType);
                 return this;
@@ -859,7 +919,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("taxes[description][" + index + "]", taxDescription);
                 return this;
             }
-            public ImportInvoiceRequest TaxJurisType(int index, TaxJurisTypeEnum taxJurisType) 
+            public ImportInvoiceRequest TaxJurisType(int index, ChargeBee.Models.Enums.TaxJurisTypeEnum taxJurisType) 
             {
                 m_params.AddOpt("taxes[juris_type][" + index + "]", taxJurisType);
                 return this;
@@ -879,7 +939,7 @@ namespace ChargeBee.Models
                 m_params.Add("payments[amount][" + index + "]", paymentAmount);
                 return this;
             }
-            public ImportInvoiceRequest PaymentPaymentMethod(int index, PaymentMethodEnum paymentPaymentMethod) 
+            public ImportInvoiceRequest PaymentPaymentMethod(int index, ChargeBee.Models.Enums.PaymentMethodEnum paymentPaymentMethod) 
             {
                 m_params.Add("payments[payment_method][" + index + "]", paymentPaymentMethod);
                 return this;
@@ -907,6 +967,32 @@ namespace ChargeBee.Models
             public ImportInvoiceRequest NoteNote(int index, string noteNote) 
             {
                 m_params.AddOpt("notes[note][" + index + "]", noteNote);
+                return this;
+            }
+        }
+        public class ApplyPaymentsRequest : EntityRequest<ApplyPaymentsRequest> 
+        {
+            public ApplyPaymentsRequest(string url, HttpMethod method) 
+                    : base(url, method)
+            {
+            }
+
+            public ApplyPaymentsRequest TransactionId(int index, string transactionId) 
+            {
+                m_params.AddOpt("transactions[id][" + index + "]", transactionId);
+                return this;
+            }
+        }
+        public class ApplyCreditsRequest : EntityRequest<ApplyCreditsRequest> 
+        {
+            public ApplyCreditsRequest(string url, HttpMethod method) 
+                    : base(url, method)
+            {
+            }
+
+            public ApplyCreditsRequest CreditNoteId(int index, string creditNoteId) 
+            {
+                m_params.AddOpt("credit_notes[id][" + index + "]", creditNoteId);
                 return this;
             }
         }
@@ -944,13 +1030,13 @@ namespace ChargeBee.Models
             {
                 return new BooleanFilter<InvoiceListRequest>("recurring", this);        
             }
-            public EnumFilter<StatusEnum, InvoiceListRequest> Status() 
+            public EnumFilter<Invoice.StatusEnum, InvoiceListRequest> Status() 
             {
-                return new EnumFilter<StatusEnum, InvoiceListRequest>("status", this);        
+                return new EnumFilter<Invoice.StatusEnum, InvoiceListRequest>("status", this);        
             }
-            public EnumFilter<PriceTypeEnum, InvoiceListRequest> PriceType() 
+            public EnumFilter<ChargeBee.Models.Enums.PriceTypeEnum, InvoiceListRequest> PriceType() 
             {
-                return new EnumFilter<PriceTypeEnum, InvoiceListRequest>("price_type", this);        
+                return new EnumFilter<ChargeBee.Models.Enums.PriceTypeEnum, InvoiceListRequest>("price_type", this);        
             }
             public TimestampFilter<InvoiceListRequest> Date() 
             {
@@ -980,20 +1066,37 @@ namespace ChargeBee.Models
             {
                 return new NumberFilter<int, InvoiceListRequest>("amount_due", this);        
             }
-            public EnumFilter<DunningStatusEnum, InvoiceListRequest> DunningStatus() 
+            public EnumFilter<Invoice.DunningStatusEnum, InvoiceListRequest> DunningStatus() 
             {
-                return new EnumFilter<DunningStatusEnum, InvoiceListRequest>("dunning_status", this).SupportsPresenceOperator(true);        
-            }
-            public TimestampFilter<InvoiceListRequest> VoidedAt() 
-            {
-                return new TimestampFilter<InvoiceListRequest>("voided_at", this);        
+                return new EnumFilter<Invoice.DunningStatusEnum, InvoiceListRequest>("dunning_status", this).SupportsPresenceOperator(true);        
             }
             public TimestampFilter<InvoiceListRequest> UpdatedAt() 
             {
                 return new TimestampFilter<InvoiceListRequest>("updated_at", this);        
             }
+            public TimestampFilter<InvoiceListRequest> VoidedAt() 
+            {
+                return new TimestampFilter<InvoiceListRequest>("voided_at", this);        
+            }
             public InvoiceListRequest SortByDate(SortOrderEnum order) {
                 m_params.AddOpt("sort_by["+order.ToString().ToLower()+"]","date");
+                return this;
+            }
+            public InvoiceListRequest SortByUpdatedAt(SortOrderEnum order) {
+                m_params.AddOpt("sort_by["+order.ToString().ToLower()+"]","updated_at");
+                return this;
+            }
+        }
+        public class PdfRequest : EntityRequest<PdfRequest> 
+        {
+            public PdfRequest(string url, HttpMethod method) 
+                    : base(url, method)
+            {
+            }
+
+            public PdfRequest DispositionType(ChargeBee.Models.Enums.DispositionTypeEnum dispositionType) 
+            {
+                m_params.AddOpt("disposition_type", dispositionType);
                 return this;
             }
         }
@@ -1012,6 +1115,16 @@ namespace ChargeBee.Models
             public AddChargeRequest Description(string description) 
             {
                 m_params.Add("description", description);
+                return this;
+            }
+            public AddChargeRequest LineItemDateFrom(long lineItemDateFrom) 
+            {
+                m_params.AddOpt("line_item[date_from]", lineItemDateFrom);
+                return this;
+            }
+            public AddChargeRequest LineItemDateTo(long lineItemDateTo) 
+            {
+                m_params.AddOpt("line_item[date_to]", lineItemDateTo);
                 return this;
             }
         }
@@ -1037,6 +1150,16 @@ namespace ChargeBee.Models
                 m_params.AddOpt("addon_unit_price", addonUnitPrice);
                 return this;
             }
+            public AddAddonChargeRequest LineItemDateFrom(long lineItemDateFrom) 
+            {
+                m_params.AddOpt("line_item[date_from]", lineItemDateFrom);
+                return this;
+            }
+            public AddAddonChargeRequest LineItemDateTo(long lineItemDateTo) 
+            {
+                m_params.AddOpt("line_item[date_to]", lineItemDateTo);
+                return this;
+            }
         }
         public class CollectPaymentRequest : EntityRequest<CollectPaymentRequest> 
         {
@@ -1048,6 +1171,11 @@ namespace ChargeBee.Models
             public CollectPaymentRequest Amount(int amount) 
             {
                 m_params.AddOpt("amount", amount);
+                return this;
+            }
+            public CollectPaymentRequest PaymentSourceId(string paymentSourceId) 
+            {
+                m_params.AddOpt("payment_source_id", paymentSourceId);
                 return this;
             }
         }
@@ -1068,7 +1196,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("transaction[amount]", transactionAmount);
                 return this;
             }
-            public RecordPaymentRequest TransactionPaymentMethod(PaymentMethodEnum transactionPaymentMethod) 
+            public RecordPaymentRequest TransactionPaymentMethod(ChargeBee.Models.Enums.PaymentMethodEnum transactionPaymentMethod) 
             {
                 m_params.Add("transaction[payment_method]", transactionPaymentMethod);
                 return this;
@@ -1083,7 +1211,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("transaction[id_at_gateway]", transactionIdAtGateway);
                 return this;
             }
-			public RecordPaymentRequest TransactionStatus(Transaction.StatusEnum transactionStatus) 
+            public RecordPaymentRequest TransactionStatus(Transaction.StatusEnum transactionStatus) 
             {
                 m_params.AddOpt("transaction[status]", transactionStatus);
                 return this;
@@ -1154,7 +1282,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("transaction[amount]", transactionAmount);
                 return this;
             }
-            public RecordRefundRequest TransactionPaymentMethod(PaymentMethodEnum transactionPaymentMethod) 
+            public RecordRefundRequest TransactionPaymentMethod(ChargeBee.Models.Enums.PaymentMethodEnum transactionPaymentMethod) 
             {
                 m_params.Add("transaction[payment_method]", transactionPaymentMethod);
                 return this;
@@ -1172,6 +1300,32 @@ namespace ChargeBee.Models
             public RecordRefundRequest CreditNoteReasonCode(CreditNote.ReasonCodeEnum creditNoteReasonCode) 
             {
                 m_params.AddOpt("credit_note[reason_code]", creditNoteReasonCode);
+                return this;
+            }
+        }
+        public class RemovePaymentRequest : EntityRequest<RemovePaymentRequest> 
+        {
+            public RemovePaymentRequest(string url, HttpMethod method) 
+                    : base(url, method)
+            {
+            }
+
+            public RemovePaymentRequest TransactionId(string transactionId) 
+            {
+                m_params.Add("transaction[id]", transactionId);
+                return this;
+            }
+        }
+        public class RemoveCreditNoteRequest : EntityRequest<RemoveCreditNoteRequest> 
+        {
+            public RemoveCreditNoteRequest(string url, HttpMethod method) 
+                    : base(url, method)
+            {
+            }
+
+            public RemoveCreditNoteRequest CreditNoteId(string creditNoteId) 
+            {
+                m_params.Add("credit_note[id]", creditNoteId);
                 return this;
             }
         }
@@ -1211,6 +1365,164 @@ namespace ChargeBee.Models
             public DeleteRequest Comment(string comment) 
             {
                 m_params.AddOpt("comment", comment);
+                return this;
+            }
+        }
+        public class UpdateDetailsRequest : EntityRequest<UpdateDetailsRequest> 
+        {
+            public UpdateDetailsRequest(string url, HttpMethod method) 
+                    : base(url, method)
+            {
+            }
+
+            public UpdateDetailsRequest VatNumber(string vatNumber) 
+            {
+                m_params.AddOpt("vat_number", vatNumber);
+                return this;
+            }
+            public UpdateDetailsRequest PoNumber(string poNumber) 
+            {
+                m_params.AddOpt("po_number", poNumber);
+                return this;
+            }
+            public UpdateDetailsRequest BillingAddressFirstName(string billingAddressFirstName) 
+            {
+                m_params.AddOpt("billing_address[first_name]", billingAddressFirstName);
+                return this;
+            }
+            public UpdateDetailsRequest BillingAddressLastName(string billingAddressLastName) 
+            {
+                m_params.AddOpt("billing_address[last_name]", billingAddressLastName);
+                return this;
+            }
+            public UpdateDetailsRequest BillingAddressEmail(string billingAddressEmail) 
+            {
+                m_params.AddOpt("billing_address[email]", billingAddressEmail);
+                return this;
+            }
+            public UpdateDetailsRequest BillingAddressCompany(string billingAddressCompany) 
+            {
+                m_params.AddOpt("billing_address[company]", billingAddressCompany);
+                return this;
+            }
+            public UpdateDetailsRequest BillingAddressPhone(string billingAddressPhone) 
+            {
+                m_params.AddOpt("billing_address[phone]", billingAddressPhone);
+                return this;
+            }
+            public UpdateDetailsRequest BillingAddressLine1(string billingAddressLine1) 
+            {
+                m_params.AddOpt("billing_address[line1]", billingAddressLine1);
+                return this;
+            }
+            public UpdateDetailsRequest BillingAddressLine2(string billingAddressLine2) 
+            {
+                m_params.AddOpt("billing_address[line2]", billingAddressLine2);
+                return this;
+            }
+            public UpdateDetailsRequest BillingAddressLine3(string billingAddressLine3) 
+            {
+                m_params.AddOpt("billing_address[line3]", billingAddressLine3);
+                return this;
+            }
+            public UpdateDetailsRequest BillingAddressCity(string billingAddressCity) 
+            {
+                m_params.AddOpt("billing_address[city]", billingAddressCity);
+                return this;
+            }
+            public UpdateDetailsRequest BillingAddressStateCode(string billingAddressStateCode) 
+            {
+                m_params.AddOpt("billing_address[state_code]", billingAddressStateCode);
+                return this;
+            }
+            public UpdateDetailsRequest BillingAddressState(string billingAddressState) 
+            {
+                m_params.AddOpt("billing_address[state]", billingAddressState);
+                return this;
+            }
+            public UpdateDetailsRequest BillingAddressZip(string billingAddressZip) 
+            {
+                m_params.AddOpt("billing_address[zip]", billingAddressZip);
+                return this;
+            }
+            public UpdateDetailsRequest BillingAddressCountry(string billingAddressCountry) 
+            {
+                m_params.AddOpt("billing_address[country]", billingAddressCountry);
+                return this;
+            }
+            public UpdateDetailsRequest BillingAddressValidationStatus(ChargeBee.Models.Enums.ValidationStatusEnum billingAddressValidationStatus) 
+            {
+                m_params.AddOpt("billing_address[validation_status]", billingAddressValidationStatus);
+                return this;
+            }
+            public UpdateDetailsRequest ShippingAddressFirstName(string shippingAddressFirstName) 
+            {
+                m_params.AddOpt("shipping_address[first_name]", shippingAddressFirstName);
+                return this;
+            }
+            public UpdateDetailsRequest ShippingAddressLastName(string shippingAddressLastName) 
+            {
+                m_params.AddOpt("shipping_address[last_name]", shippingAddressLastName);
+                return this;
+            }
+            public UpdateDetailsRequest ShippingAddressEmail(string shippingAddressEmail) 
+            {
+                m_params.AddOpt("shipping_address[email]", shippingAddressEmail);
+                return this;
+            }
+            public UpdateDetailsRequest ShippingAddressCompany(string shippingAddressCompany) 
+            {
+                m_params.AddOpt("shipping_address[company]", shippingAddressCompany);
+                return this;
+            }
+            public UpdateDetailsRequest ShippingAddressPhone(string shippingAddressPhone) 
+            {
+                m_params.AddOpt("shipping_address[phone]", shippingAddressPhone);
+                return this;
+            }
+            public UpdateDetailsRequest ShippingAddressLine1(string shippingAddressLine1) 
+            {
+                m_params.AddOpt("shipping_address[line1]", shippingAddressLine1);
+                return this;
+            }
+            public UpdateDetailsRequest ShippingAddressLine2(string shippingAddressLine2) 
+            {
+                m_params.AddOpt("shipping_address[line2]", shippingAddressLine2);
+                return this;
+            }
+            public UpdateDetailsRequest ShippingAddressLine3(string shippingAddressLine3) 
+            {
+                m_params.AddOpt("shipping_address[line3]", shippingAddressLine3);
+                return this;
+            }
+            public UpdateDetailsRequest ShippingAddressCity(string shippingAddressCity) 
+            {
+                m_params.AddOpt("shipping_address[city]", shippingAddressCity);
+                return this;
+            }
+            public UpdateDetailsRequest ShippingAddressStateCode(string shippingAddressStateCode) 
+            {
+                m_params.AddOpt("shipping_address[state_code]", shippingAddressStateCode);
+                return this;
+            }
+            public UpdateDetailsRequest ShippingAddressState(string shippingAddressState) 
+            {
+                m_params.AddOpt("shipping_address[state]", shippingAddressState);
+                return this;
+            }
+            public UpdateDetailsRequest ShippingAddressZip(string shippingAddressZip) 
+            {
+                m_params.AddOpt("shipping_address[zip]", shippingAddressZip);
+                return this;
+            }
+            public UpdateDetailsRequest ShippingAddressCountry(string shippingAddressCountry) 
+            {
+                m_params.AddOpt("shipping_address[country]", shippingAddressCountry);
+                return this;
+            }
+            public UpdateDetailsRequest ShippingAddressValidationStatus(ChargeBee.Models.Enums.ValidationStatusEnum shippingAddressValidationStatus) 
+            {
+                m_params.AddOpt("shipping_address[validation_status]", shippingAddressValidationStatus);
                 return this;
             }
         }
@@ -1270,6 +1582,10 @@ namespace ChargeBee.Models
 
             public string Id() {
                 return GetValue<string>("id", false);
+            }
+
+            public string SubscriptionId() {
+                return GetValue<string>("subscription_id", false);
             }
 
             public DateTime DateFrom() {
@@ -1359,6 +1675,39 @@ namespace ChargeBee.Models
 
             public string EntityId() {
                 return GetValue<string>("entity_id", false);
+            }
+
+        }
+        public class InvoiceLineItemDiscount : Resource
+        {
+            public enum DiscountTypeEnum
+            {
+                UnKnown, /*Indicates unexpected value for this enum. You can get this when there is a
+                dotnet-client version incompatibility. We suggest you to upgrade to the latest version */
+                [Description("item_level_coupon")]
+                ItemLevelCoupon,
+                [Description("document_level_coupon")]
+                DocumentLevelCoupon,
+                [Description("promotional_credits")]
+                PromotionalCredits,
+                [Description("prorated_credits")]
+                ProratedCredits,
+            }
+
+            public string LineItemId() {
+                return GetValue<string>("line_item_id", true);
+            }
+
+            public DiscountTypeEnum DiscountType() {
+                return GetEnum<DiscountTypeEnum>("discount_type", true);
+            }
+
+            public string CouponId() {
+                return GetValue<string>("coupon_id", false);
+            }
+
+            public int DiscountAmount() {
+                return GetValue<int>("discount_amount", true);
             }
 
         }

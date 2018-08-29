@@ -40,10 +40,40 @@ namespace ChargeBee.Models
             string url = ApiUtil.BuildUrl("hosted_pages", "update_payment_method");
             return new UpdatePaymentMethodRequest(url, HttpMethod.POST);
         }
+        public static ManagePaymentSourcesRequest ManagePaymentSources()
+        {
+            string url = ApiUtil.BuildUrl("hosted_pages", "manage_payment_sources");
+            return new ManagePaymentSourcesRequest(url, HttpMethod.POST);
+        }
+        public static CollectNowRequest CollectNow()
+        {
+            string url = ApiUtil.BuildUrl("hosted_pages", "collect_now");
+            return new CollectNowRequest(url, HttpMethod.POST);
+        }
+        public static ExtendSubscriptionRequest ExtendSubscription()
+        {
+            string url = ApiUtil.BuildUrl("hosted_pages", "extend_subscription");
+            return new ExtendSubscriptionRequest(url, HttpMethod.POST);
+        }
+        public static RetrieveAgreementPdfRequest RetrieveAgreementPdf()
+        {
+            string url = ApiUtil.BuildUrl("hosted_pages", "retrieve_agreement_pdf");
+            return new RetrieveAgreementPdfRequest(url, HttpMethod.POST);
+        }
+        public static EntityRequest<Type> Acknowledge(string id)
+        {
+            string url = ApiUtil.BuildUrl("hosted_pages", CheckNull(id), "acknowledge");
+            return new EntityRequest<Type>(url, HttpMethod.POST);
+        }
         public static EntityRequest<Type> Retrieve(string id)
         {
             string url = ApiUtil.BuildUrl("hosted_pages", CheckNull(id));
             return new EntityRequest<Type>(url, HttpMethod.GET);
+        }
+        public static HostedPageListRequest List()
+        {
+            string url = ApiUtil.BuildUrl("hosted_pages");
+            return new HostedPageListRequest(url);
         }
         #endregion
         
@@ -64,6 +94,7 @@ namespace ChargeBee.Models
         {
             get { return GetEnum<StateEnum>("state", false); }
         }
+        [Obsolete]
         public FailureReasonEnum? FailureReason 
         {
             get { return GetEnum<FailureReasonEnum>("failure_reason", false); }
@@ -83,6 +114,18 @@ namespace ChargeBee.Models
         public DateTime? ExpiresAt 
         {
             get { return GetDateTime("expires_at", false); }
+        }
+        public DateTime? UpdatedAt 
+        {
+            get { return GetDateTime("updated_at", false); }
+        }
+        public long? ResourceVersion 
+        {
+            get { return GetValue<long?>("resource_version", false); }
+        }
+        public JToken CheckoutInfo 
+        {
+            get { return GetJToken("checkout_info", false); }
         }
         public HostedPageContent Content
         {
@@ -108,6 +151,16 @@ namespace ChargeBee.Models
             public CheckoutNewRequest BillingCycles(int billingCycles) 
             {
                 m_params.AddOpt("billing_cycles", billingCycles);
+                return this;
+            }
+            public CheckoutNewRequest TermsToCharge(int termsToCharge) 
+            {
+                m_params.AddOpt("terms_to_charge", termsToCharge);
+                return this;
+            }
+            public CheckoutNewRequest BillingAlignmentMode(ChargeBee.Models.Enums.BillingAlignmentModeEnum billingAlignmentMode) 
+            {
+                m_params.AddOpt("billing_alignment_mode", billingAlignmentMode);
                 return this;
             }
             public CheckoutNewRequest RedirectUrl(string redirectUrl) 
@@ -165,7 +218,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("customer[company]", customerCompany);
                 return this;
             }
-            public CheckoutNewRequest CustomerTaxability(TaxabilityEnum customerTaxability) 
+            public CheckoutNewRequest CustomerTaxability(ChargeBee.Models.Enums.TaxabilityEnum customerTaxability) 
             {
                 m_params.AddOpt("customer[taxability]", customerTaxability);
                 return this;
@@ -215,13 +268,18 @@ namespace ChargeBee.Models
                 m_params.AddOpt("subscription[coupon]", subscriptionCoupon);
                 return this;
             }
+            public CheckoutNewRequest SubscriptionAutoCollection(ChargeBee.Models.Enums.AutoCollectionEnum subscriptionAutoCollection) 
+            {
+                m_params.AddOpt("subscription[auto_collection]", subscriptionAutoCollection);
+                return this;
+            }
             public CheckoutNewRequest SubscriptionInvoiceNotes(string subscriptionInvoiceNotes) 
             {
                 m_params.AddOpt("subscription[invoice_notes]", subscriptionInvoiceNotes);
                 return this;
             }
             [Obsolete]
-            public CheckoutNewRequest CardGateway(GatewayEnum cardGateway) 
+            public CheckoutNewRequest CardGateway(ChargeBee.Models.Enums.GatewayEnum cardGateway) 
             {
                 m_params.AddOpt("card[gateway]", cardGateway);
                 return this;
@@ -231,10 +289,14 @@ namespace ChargeBee.Models
                 m_params.AddOpt("card[gateway_account_id]", cardGatewayAccountId);
                 return this;
             }
-            [Obsolete]
             public CheckoutNewRequest CustomerVatNumber(string customerVatNumber) 
             {
                 m_params.AddOpt("customer[vat_number]", customerVatNumber);
+                return this;
+            }
+            public CheckoutNewRequest CustomerConsolidatedInvoicing(bool customerConsolidatedInvoicing) 
+            {
+                m_params.AddOpt("customer[consolidated_invoicing]", customerConsolidatedInvoicing);
                 return this;
             }
             public CheckoutNewRequest BillingAddressFirstName(string billingAddressFirstName) 
@@ -302,7 +364,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("billing_address[country]", billingAddressCountry);
                 return this;
             }
-            public CheckoutNewRequest BillingAddressValidationStatus(ValidationStatusEnum billingAddressValidationStatus) 
+            public CheckoutNewRequest BillingAddressValidationStatus(ChargeBee.Models.Enums.ValidationStatusEnum billingAddressValidationStatus) 
             {
                 m_params.AddOpt("billing_address[validation_status]", billingAddressValidationStatus);
                 return this;
@@ -372,7 +434,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("shipping_address[country]", shippingAddressCountry);
                 return this;
             }
-            public CheckoutNewRequest ShippingAddressValidationStatus(ValidationStatusEnum shippingAddressValidationStatus) 
+            public CheckoutNewRequest ShippingAddressValidationStatus(ChargeBee.Models.Enums.ValidationStatusEnum shippingAddressValidationStatus) 
             {
                 m_params.AddOpt("shipping_address[validation_status]", shippingAddressValidationStatus);
                 return this;
@@ -420,9 +482,19 @@ namespace ChargeBee.Models
                 m_params.AddOpt("reactivate_from", reactivateFrom);
                 return this;
             }
+            public CheckoutExistingRequest BillingAlignmentMode(ChargeBee.Models.Enums.BillingAlignmentModeEnum billingAlignmentMode) 
+            {
+                m_params.AddOpt("billing_alignment_mode", billingAlignmentMode);
+                return this;
+            }
             public CheckoutExistingRequest Reactivate(bool reactivate) 
             {
                 m_params.AddOpt("reactivate", reactivate);
+                return this;
+            }
+            public CheckoutExistingRequest ForceTermReset(bool forceTermReset) 
+            {
+                m_params.AddOpt("force_term_reset", forceTermReset);
                 return this;
             }
             public CheckoutExistingRequest RedirectUrl(string redirectUrl) 
@@ -495,14 +567,13 @@ namespace ChargeBee.Models
                 m_params.AddOpt("subscription[invoice_notes]", subscriptionInvoiceNotes);
                 return this;
             }
-            [Obsolete]
             public CheckoutExistingRequest CustomerVatNumber(string customerVatNumber) 
             {
                 m_params.AddOpt("customer[vat_number]", customerVatNumber);
                 return this;
             }
             [Obsolete]
-            public CheckoutExistingRequest CardGateway(GatewayEnum cardGateway) 
+            public CheckoutExistingRequest CardGateway(ChargeBee.Models.Enums.GatewayEnum cardGateway) 
             {
                 m_params.AddOpt("card[gateway]", cardGateway);
                 return this;
@@ -572,7 +643,7 @@ namespace ChargeBee.Models
                 return this;
             }
             [Obsolete]
-            public UpdateCardRequest CardGateway(GatewayEnum cardGateway) 
+            public UpdateCardRequest CardGateway(ChargeBee.Models.Enums.GatewayEnum cardGateway) 
             {
                 m_params.AddOpt("card[gateway]", cardGateway);
                 return this;
@@ -627,7 +698,7 @@ namespace ChargeBee.Models
                 return this;
             }
             [Obsolete]
-            public UpdatePaymentMethodRequest CardGateway(GatewayEnum cardGateway) 
+            public UpdatePaymentMethodRequest CardGateway(ChargeBee.Models.Enums.GatewayEnum cardGateway) 
             {
                 m_params.AddOpt("card[gateway]", cardGateway);
                 return this;
@@ -636,6 +707,119 @@ namespace ChargeBee.Models
             {
                 m_params.AddOpt("card[gateway_account_id]", cardGatewayAccountId);
                 return this;
+            }
+        }
+        public class ManagePaymentSourcesRequest : EntityRequest<ManagePaymentSourcesRequest> 
+        {
+            public ManagePaymentSourcesRequest(string url, HttpMethod method) 
+                    : base(url, method)
+            {
+            }
+
+            public ManagePaymentSourcesRequest CustomerId(string customerId) 
+            {
+                m_params.Add("customer[id]", customerId);
+                return this;
+            }
+            [Obsolete]
+            public ManagePaymentSourcesRequest CardGateway(ChargeBee.Models.Enums.GatewayEnum cardGateway) 
+            {
+                m_params.AddOpt("card[gateway]", cardGateway);
+                return this;
+            }
+            public ManagePaymentSourcesRequest CardGatewayAccountId(string cardGatewayAccountId) 
+            {
+                m_params.AddOpt("card[gateway_account_id]", cardGatewayAccountId);
+                return this;
+            }
+        }
+        public class CollectNowRequest : EntityRequest<CollectNowRequest> 
+        {
+            public CollectNowRequest(string url, HttpMethod method) 
+                    : base(url, method)
+            {
+            }
+
+            public CollectNowRequest CurrencyCode(string currencyCode) 
+            {
+                m_params.AddOpt("currency_code", currencyCode);
+                return this;
+            }
+            public CollectNowRequest CustomerId(string customerId) 
+            {
+                m_params.Add("customer[id]", customerId);
+                return this;
+            }
+            [Obsolete]
+            public CollectNowRequest CardGateway(ChargeBee.Models.Enums.GatewayEnum cardGateway) 
+            {
+                m_params.AddOpt("card[gateway]", cardGateway);
+                return this;
+            }
+            public CollectNowRequest CardGatewayAccountId(string cardGatewayAccountId) 
+            {
+                m_params.AddOpt("card[gateway_account_id]", cardGatewayAccountId);
+                return this;
+            }
+        }
+        public class ExtendSubscriptionRequest : EntityRequest<ExtendSubscriptionRequest> 
+        {
+            public ExtendSubscriptionRequest(string url, HttpMethod method) 
+                    : base(url, method)
+            {
+            }
+
+            public ExtendSubscriptionRequest Expiry(int expiry) 
+            {
+                m_params.AddOpt("expiry", expiry);
+                return this;
+            }
+            public ExtendSubscriptionRequest BillingCycle(int billingCycle) 
+            {
+                m_params.AddOpt("billing_cycle", billingCycle);
+                return this;
+            }
+            public ExtendSubscriptionRequest SubscriptionId(string subscriptionId) 
+            {
+                m_params.Add("subscription[id]", subscriptionId);
+                return this;
+            }
+        }
+        public class RetrieveAgreementPdfRequest : EntityRequest<RetrieveAgreementPdfRequest> 
+        {
+            public RetrieveAgreementPdfRequest(string url, HttpMethod method) 
+                    : base(url, method)
+            {
+            }
+
+            public RetrieveAgreementPdfRequest PaymentSourceId(string paymentSourceId) 
+            {
+                m_params.Add("payment_source_id", paymentSourceId);
+                return this;
+            }
+        }
+        public class HostedPageListRequest : ListRequestBase<HostedPageListRequest> 
+        {
+            public HostedPageListRequest(string url) 
+                    : base(url)
+            {
+            }
+
+            public StringFilter<HostedPageListRequest> Id() 
+            {
+                return new StringFilter<HostedPageListRequest>("id", this).SupportsMultiOperators(true);        
+            }
+            public EnumFilter<HostedPage.TypeEnum, HostedPageListRequest> Type() 
+            {
+                return new EnumFilter<HostedPage.TypeEnum, HostedPageListRequest>("type", this);        
+            }
+            public EnumFilter<HostedPage.StateEnum, HostedPageListRequest> State() 
+            {
+                return new EnumFilter<HostedPage.StateEnum, HostedPageListRequest>("state", this);        
+            }
+            public TimestampFilter<HostedPageListRequest> UpdatedAt() 
+            {
+                return new TimestampFilter<HostedPageListRequest>("updated_at", this);        
             }
         }
         #endregion
@@ -654,6 +838,12 @@ namespace ChargeBee.Models
             UpdateCard,
             [Description("update_payment_method")]
             UpdatePaymentMethod,
+            [Description("manage_payment_sources")]
+            ManagePaymentSources,
+            [Description("collect_now")]
+            CollectNow,
+            [Description("extend_subscription")]
+            ExtendSubscription,
 
         }
         public enum StateEnum
@@ -670,9 +860,13 @@ namespace ChargeBee.Models
             [Description("cancelled")]
             Cancelled,
             [Description("failed")]
+            [Obsolete]
             Failed,
+            [Description("acknowledged")]
+            Acknowledged,
 
         }
+        [Obsolete]
         public enum FailureReasonEnum
         {
 

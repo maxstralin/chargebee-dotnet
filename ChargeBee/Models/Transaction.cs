@@ -65,6 +65,10 @@ namespace ChargeBee.Models
         {
             get { return GetValue<string>("gateway_account_id", false); }
         }
+        public string PaymentSourceId 
+        {
+            get { return GetValue<string>("payment_source_id", false); }
+        }
         public PaymentMethodEnum PaymentMethod 
         {
             get { return GetEnum<PaymentMethodEnum>("payment_method", true); }
@@ -85,6 +89,10 @@ namespace ChargeBee.Models
         {
             get { return GetDateTime("date", false); }
         }
+        public DateTime? SettledAt 
+        {
+            get { return GetDateTime("settled_at", false); }
+        }
         public string CurrencyCode 
         {
             get { return GetValue<string>("currency_code", true); }
@@ -100,6 +108,10 @@ namespace ChargeBee.Models
         public StatusEnum? Status 
         {
             get { return GetEnum<StatusEnum>("status", false); }
+        }
+        public FraudFlagEnum? FraudFlag 
+        {
+            get { return GetEnum<FraudFlagEnum>("fraud_flag", false); }
         }
         public string ErrorCode 
         {
@@ -120,6 +132,10 @@ namespace ChargeBee.Models
         public DateTime? UpdatedAt 
         {
             get { return GetDateTime("updated_at", false); }
+        }
+        public string FraudReason 
+        {
+            get { return GetValue<string>("fraud_reason", false); }
         }
         public int? AmountUnused 
         {
@@ -185,13 +201,17 @@ namespace ChargeBee.Models
             {
                 return new StringFilter<TransactionListRequest>("subscription_id", this).SupportsMultiOperators(true).SupportsPresenceOperator(true);        
             }
-            public EnumFilter<PaymentMethodEnum, TransactionListRequest> PaymentMethod() 
+            public StringFilter<TransactionListRequest> PaymentSourceId() 
             {
-                return new EnumFilter<PaymentMethodEnum, TransactionListRequest>("payment_method", this);        
+                return new StringFilter<TransactionListRequest>("payment_source_id", this).SupportsMultiOperators(true).SupportsPresenceOperator(true);        
             }
-            public EnumFilter<GatewayEnum, TransactionListRequest> Gateway() 
+            public EnumFilter<ChargeBee.Models.Enums.PaymentMethodEnum, TransactionListRequest> PaymentMethod() 
             {
-                return new EnumFilter<GatewayEnum, TransactionListRequest>("gateway", this);        
+                return new EnumFilter<ChargeBee.Models.Enums.PaymentMethodEnum, TransactionListRequest>("payment_method", this);        
+            }
+            public EnumFilter<ChargeBee.Models.Enums.GatewayEnum, TransactionListRequest> Gateway() 
+            {
+                return new EnumFilter<ChargeBee.Models.Enums.GatewayEnum, TransactionListRequest>("gateway", this);        
             }
             public StringFilter<TransactionListRequest> GatewayAccountId() 
             {
@@ -205,9 +225,9 @@ namespace ChargeBee.Models
             {
                 return new StringFilter<TransactionListRequest>("reference_number", this).SupportsPresenceOperator(true);        
             }
-            public EnumFilter<TypeEnum, TransactionListRequest> Type() 
+            public EnumFilter<Transaction.TypeEnum, TransactionListRequest> Type() 
             {
-                return new EnumFilter<TypeEnum, TransactionListRequest>("type", this);        
+                return new EnumFilter<Transaction.TypeEnum, TransactionListRequest>("type", this);        
             }
             public TimestampFilter<TransactionListRequest> Date() 
             {
@@ -217,9 +237,9 @@ namespace ChargeBee.Models
             {
                 return new NumberFilter<int, TransactionListRequest>("amount", this);        
             }
-            public EnumFilter<StatusEnum, TransactionListRequest> Status() 
+            public EnumFilter<Transaction.StatusEnum, TransactionListRequest> Status() 
             {
-                return new EnumFilter<StatusEnum, TransactionListRequest>("status", this);        
+                return new EnumFilter<Transaction.StatusEnum, TransactionListRequest>("status", this);        
             }
             public TimestampFilter<TransactionListRequest> UpdatedAt() 
             {
@@ -264,6 +284,19 @@ namespace ChargeBee.Models
             Timeout,
             [Description("needs_attention")]
             NeedsAttention,
+
+        }
+        public enum FraudFlagEnum
+        {
+
+            UnKnown, /*Indicates unexpected value for this enum. You can get this when there is a
+            dotnet-client version incompatibility. We suggest you to upgrade to the latest version */
+            [Description("safe")]
+            Safe,
+            [Description("suspicious")]
+            Suspicious,
+            [Description("fraudulent")]
+            Fraudulent,
 
         }
 

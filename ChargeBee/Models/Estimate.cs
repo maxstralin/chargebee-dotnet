@@ -39,6 +39,31 @@ namespace ChargeBee.Models
             string url = ApiUtil.BuildUrl("subscriptions", CheckNull(id), "renewal_estimate");
             return new RenewalEstimateRequest(url, HttpMethod.GET);
         }
+        public static EntityRequest<Type> UpcomingInvoicesEstimate(string id)
+        {
+            string url = ApiUtil.BuildUrl("customers", CheckNull(id), "upcoming_invoices_estimate");
+            return new EntityRequest<Type>(url, HttpMethod.GET);
+        }
+        public static ChangeTermEndRequest ChangeTermEnd(string id)
+        {
+            string url = ApiUtil.BuildUrl("subscriptions", CheckNull(id), "change_term_end_estimate");
+            return new ChangeTermEndRequest(url, HttpMethod.POST);
+        }
+        public static CancelSubscriptionRequest CancelSubscription(string id)
+        {
+            string url = ApiUtil.BuildUrl("subscriptions", CheckNull(id), "cancel_subscription_estimate");
+            return new CancelSubscriptionRequest(url, HttpMethod.POST);
+        }
+        public static PauseSubscriptionRequest PauseSubscription(string id)
+        {
+            string url = ApiUtil.BuildUrl("subscriptions", CheckNull(id), "pause_subscription_estimate");
+            return new PauseSubscriptionRequest(url, HttpMethod.POST);
+        }
+        public static ResumeSubscriptionRequest ResumeSubscription(string id)
+        {
+            string url = ApiUtil.BuildUrl("subscriptions", CheckNull(id), "resume_subscription_estimate");
+            return new ResumeSubscriptionRequest(url, HttpMethod.POST);
+        }
         #endregion
         
         #region Properties
@@ -54,6 +79,10 @@ namespace ChargeBee.Models
         {
             get { return GetSubResource<InvoiceEstimate>("invoice_estimate"); }
         }
+        public List<InvoiceEstimate> InvoiceEstimates 
+        {
+            get { return GetResourceList<InvoiceEstimate>("invoice_estimates"); }
+        }
         public InvoiceEstimate NextInvoiceEstimate 
         {
             get { return GetSubResource<InvoiceEstimate>("next_invoice_estimate"); }
@@ -61,6 +90,10 @@ namespace ChargeBee.Models
         public List<CreditNoteEstimate> CreditNoteEstimates 
         {
             get { return GetResourceList<CreditNoteEstimate>("credit_note_estimates"); }
+        }
+        public List<UnbilledCharge> UnbilledChargeEstimates 
+        {
+            get { return GetResourceList<UnbilledCharge>("unbilled_charge_estimates"); }
         }
         
         #endregion
@@ -78,9 +111,24 @@ namespace ChargeBee.Models
                 m_params.AddOpt("billing_cycles", billingCycles);
                 return this;
             }
+            public CreateSubscriptionRequest TermsToCharge(int termsToCharge) 
+            {
+                m_params.AddOpt("terms_to_charge", termsToCharge);
+                return this;
+            }
+            public CreateSubscriptionRequest BillingAlignmentMode(ChargeBee.Models.Enums.BillingAlignmentModeEnum billingAlignmentMode) 
+            {
+                m_params.AddOpt("billing_alignment_mode", billingAlignmentMode);
+                return this;
+            }
             public CreateSubscriptionRequest CouponIds(List<string> couponIds) 
             {
                 m_params.AddOpt("coupon_ids", couponIds);
+                return this;
+            }
+            public CreateSubscriptionRequest InvoiceImmediately(bool invoiceImmediately) 
+            {
+                m_params.AddOpt("invoice_immediately", invoiceImmediately);
                 return this;
             }
             public CreateSubscriptionRequest SubscriptionId(string subscriptionId) 
@@ -159,7 +207,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("billing_address[country]", billingAddressCountry);
                 return this;
             }
-            public CreateSubscriptionRequest BillingAddressValidationStatus(ValidationStatusEnum billingAddressValidationStatus) 
+            public CreateSubscriptionRequest BillingAddressValidationStatus(ChargeBee.Models.Enums.ValidationStatusEnum billingAddressValidationStatus) 
             {
                 m_params.AddOpt("billing_address[validation_status]", billingAddressValidationStatus);
                 return this;
@@ -199,7 +247,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("shipping_address[country]", shippingAddressCountry);
                 return this;
             }
-            public CreateSubscriptionRequest ShippingAddressValidationStatus(ValidationStatusEnum shippingAddressValidationStatus) 
+            public CreateSubscriptionRequest ShippingAddressValidationStatus(ChargeBee.Models.Enums.ValidationStatusEnum shippingAddressValidationStatus) 
             {
                 m_params.AddOpt("shipping_address[validation_status]", shippingAddressValidationStatus);
                 return this;
@@ -209,12 +257,17 @@ namespace ChargeBee.Models
                 m_params.AddOpt("customer[vat_number]", customerVatNumber);
                 return this;
             }
-            public CreateSubscriptionRequest CustomerTaxability(TaxabilityEnum customerTaxability) 
+            public CreateSubscriptionRequest CustomerRegisteredForGst(bool customerRegisteredForGst) 
+            {
+                m_params.AddOpt("customer[registered_for_gst]", customerRegisteredForGst);
+                return this;
+            }
+            public CreateSubscriptionRequest CustomerTaxability(ChargeBee.Models.Enums.TaxabilityEnum customerTaxability) 
             {
                 m_params.AddOpt("customer[taxability]", customerTaxability);
                 return this;
             }
-            public CreateSubscriptionRequest CustomerEntityCode(EntityCodeEnum customerEntityCode) 
+            public CreateSubscriptionRequest CustomerEntityCode(ChargeBee.Models.Enums.EntityCodeEnum customerEntityCode) 
             {
                 m_params.AddOpt("customer[entity_code]", customerEntityCode);
                 return this;
@@ -239,6 +292,11 @@ namespace ChargeBee.Models
                 m_params.AddOpt("addons[unit_price][" + index + "]", addonUnitPrice);
                 return this;
             }
+            public CreateSubscriptionRequest AddonTrialEnd(int index, long addonTrialEnd) 
+            {
+                m_params.AddOpt("addons[trial_end][" + index + "]", addonTrialEnd);
+                return this;
+            }
         }
         public class CreateSubForCustomerEstimateRequest : EntityRequest<CreateSubForCustomerEstimateRequest> 
         {
@@ -252,9 +310,24 @@ namespace ChargeBee.Models
                 m_params.AddOpt("use_existing_balances", useExistingBalances);
                 return this;
             }
+            public CreateSubForCustomerEstimateRequest InvoiceImmediately(bool invoiceImmediately) 
+            {
+                m_params.AddOpt("invoice_immediately", invoiceImmediately);
+                return this;
+            }
             public CreateSubForCustomerEstimateRequest BillingCycles(int billingCycles) 
             {
                 m_params.AddOpt("billing_cycles", billingCycles);
+                return this;
+            }
+            public CreateSubForCustomerEstimateRequest TermsToCharge(int termsToCharge) 
+            {
+                m_params.AddOpt("terms_to_charge", termsToCharge);
+                return this;
+            }
+            public CreateSubForCustomerEstimateRequest BillingAlignmentMode(ChargeBee.Models.Enums.BillingAlignmentModeEnum billingAlignmentMode) 
+            {
+                m_params.AddOpt("billing_alignment_mode", billingAlignmentMode);
                 return this;
             }
             public CreateSubForCustomerEstimateRequest CouponIds(List<string> couponIds) 
@@ -332,7 +405,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("shipping_address[country]", shippingAddressCountry);
                 return this;
             }
-            public CreateSubForCustomerEstimateRequest ShippingAddressValidationStatus(ValidationStatusEnum shippingAddressValidationStatus) 
+            public CreateSubForCustomerEstimateRequest ShippingAddressValidationStatus(ChargeBee.Models.Enums.ValidationStatusEnum shippingAddressValidationStatus) 
             {
                 m_params.AddOpt("shipping_address[validation_status]", shippingAddressValidationStatus);
                 return this;
@@ -350,6 +423,11 @@ namespace ChargeBee.Models
             public CreateSubForCustomerEstimateRequest AddonUnitPrice(int index, int addonUnitPrice) 
             {
                 m_params.AddOpt("addons[unit_price][" + index + "]", addonUnitPrice);
+                return this;
+            }
+            public CreateSubForCustomerEstimateRequest AddonTrialEnd(int index, long addonTrialEnd) 
+            {
+                m_params.AddOpt("addons[trial_end][" + index + "]", addonTrialEnd);
                 return this;
             }
         }
@@ -378,6 +456,11 @@ namespace ChargeBee.Models
             public UpdateSubscriptionRequest ReactivateFrom(long reactivateFrom) 
             {
                 m_params.AddOpt("reactivate_from", reactivateFrom);
+                return this;
+            }
+            public UpdateSubscriptionRequest BillingAlignmentMode(ChargeBee.Models.Enums.BillingAlignmentModeEnum billingAlignmentMode) 
+            {
+                m_params.AddOpt("billing_alignment_mode", billingAlignmentMode);
                 return this;
             }
             public UpdateSubscriptionRequest CouponIds(List<string> couponIds) 
@@ -418,6 +501,11 @@ namespace ChargeBee.Models
             public UpdateSubscriptionRequest UseExistingBalances(bool useExistingBalances) 
             {
                 m_params.AddOpt("use_existing_balances", useExistingBalances);
+                return this;
+            }
+            public UpdateSubscriptionRequest InvoiceImmediately(bool invoiceImmediately) 
+            {
+                m_params.AddOpt("invoice_immediately", invoiceImmediately);
                 return this;
             }
             public UpdateSubscriptionRequest SubscriptionId(string subscriptionId) 
@@ -496,7 +584,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("billing_address[country]", billingAddressCountry);
                 return this;
             }
-            public UpdateSubscriptionRequest BillingAddressValidationStatus(ValidationStatusEnum billingAddressValidationStatus) 
+            public UpdateSubscriptionRequest BillingAddressValidationStatus(ChargeBee.Models.Enums.ValidationStatusEnum billingAddressValidationStatus) 
             {
                 m_params.AddOpt("billing_address[validation_status]", billingAddressValidationStatus);
                 return this;
@@ -536,7 +624,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("shipping_address[country]", shippingAddressCountry);
                 return this;
             }
-            public UpdateSubscriptionRequest ShippingAddressValidationStatus(ValidationStatusEnum shippingAddressValidationStatus) 
+            public UpdateSubscriptionRequest ShippingAddressValidationStatus(ChargeBee.Models.Enums.ValidationStatusEnum shippingAddressValidationStatus) 
             {
                 m_params.AddOpt("shipping_address[validation_status]", shippingAddressValidationStatus);
                 return this;
@@ -546,8 +634,13 @@ namespace ChargeBee.Models
                 m_params.AddOpt("customer[vat_number]", customerVatNumber);
                 return this;
             }
+            public UpdateSubscriptionRequest CustomerRegisteredForGst(bool customerRegisteredForGst) 
+            {
+                m_params.AddOpt("customer[registered_for_gst]", customerRegisteredForGst);
+                return this;
+            }
             [Obsolete]
-            public UpdateSubscriptionRequest CustomerTaxability(TaxabilityEnum customerTaxability) 
+            public UpdateSubscriptionRequest CustomerTaxability(ChargeBee.Models.Enums.TaxabilityEnum customerTaxability) 
             {
                 m_params.AddOpt("customer[taxability]", customerTaxability);
                 return this;
@@ -565,6 +658,11 @@ namespace ChargeBee.Models
             public UpdateSubscriptionRequest AddonUnitPrice(int index, int addonUnitPrice) 
             {
                 m_params.AddOpt("addons[unit_price][" + index + "]", addonUnitPrice);
+                return this;
+            }
+            public UpdateSubscriptionRequest AddonTrialEnd(int index, long addonTrialEnd) 
+            {
+                m_params.AddOpt("addons[trial_end][" + index + "]", addonTrialEnd);
                 return this;
             }
         }
@@ -593,6 +691,113 @@ namespace ChargeBee.Models
             public RenewalEstimateRequest IgnoreScheduledChanges(bool ignoreScheduledChanges) 
             {
                 m_params.AddOpt("ignore_scheduled_changes", ignoreScheduledChanges);
+                return this;
+            }
+        }
+        public class ChangeTermEndRequest : EntityRequest<ChangeTermEndRequest> 
+        {
+            public ChangeTermEndRequest(string url, HttpMethod method) 
+                    : base(url, method)
+            {
+            }
+
+            public ChangeTermEndRequest TermEndsAt(long termEndsAt) 
+            {
+                m_params.AddOpt("term_ends_at", termEndsAt);
+                return this;
+            }
+            public ChangeTermEndRequest Prorate(bool prorate) 
+            {
+                m_params.AddOpt("prorate", prorate);
+                return this;
+            }
+            public ChangeTermEndRequest InvoiceImmediately(bool invoiceImmediately) 
+            {
+                m_params.AddOpt("invoice_immediately", invoiceImmediately);
+                return this;
+            }
+        }
+        public class CancelSubscriptionRequest : EntityRequest<CancelSubscriptionRequest> 
+        {
+            public CancelSubscriptionRequest(string url, HttpMethod method) 
+                    : base(url, method)
+            {
+            }
+
+            public CancelSubscriptionRequest EndOfTerm(bool endOfTerm) 
+            {
+                m_params.AddOpt("end_of_term", endOfTerm);
+                return this;
+            }
+            public CancelSubscriptionRequest CreditOptionForCurrentTermCharges(ChargeBee.Models.Enums.CreditOptionForCurrentTermChargesEnum creditOptionForCurrentTermCharges) 
+            {
+                m_params.AddOpt("credit_option_for_current_term_charges", creditOptionForCurrentTermCharges);
+                return this;
+            }
+            public CancelSubscriptionRequest UnbilledChargesOption(ChargeBee.Models.Enums.UnbilledChargesOptionEnum unbilledChargesOption) 
+            {
+                m_params.AddOpt("unbilled_charges_option", unbilledChargesOption);
+                return this;
+            }
+            public CancelSubscriptionRequest AccountReceivablesHandling(ChargeBee.Models.Enums.AccountReceivablesHandlingEnum accountReceivablesHandling) 
+            {
+                m_params.AddOpt("account_receivables_handling", accountReceivablesHandling);
+                return this;
+            }
+            public CancelSubscriptionRequest RefundableCreditsHandling(ChargeBee.Models.Enums.RefundableCreditsHandlingEnum refundableCreditsHandling) 
+            {
+                m_params.AddOpt("refundable_credits_handling", refundableCreditsHandling);
+                return this;
+            }
+        }
+        public class PauseSubscriptionRequest : EntityRequest<PauseSubscriptionRequest> 
+        {
+            public PauseSubscriptionRequest(string url, HttpMethod method) 
+                    : base(url, method)
+            {
+            }
+
+            public PauseSubscriptionRequest PauseOption(ChargeBee.Models.Enums.PauseOptionEnum pauseOption) 
+            {
+                m_params.AddOpt("pause_option", pauseOption);
+                return this;
+            }
+            public PauseSubscriptionRequest UnbilledChargesHandling(ChargeBee.Models.Enums.UnbilledChargesHandlingEnum unbilledChargesHandling) 
+            {
+                m_params.AddOpt("unbilled_charges_handling", unbilledChargesHandling);
+                return this;
+            }
+            public PauseSubscriptionRequest SubscriptionPauseDate(long subscriptionPauseDate) 
+            {
+                m_params.AddOpt("subscription[pause_date]", subscriptionPauseDate);
+                return this;
+            }
+            public PauseSubscriptionRequest SubscriptionResumeDate(long subscriptionResumeDate) 
+            {
+                m_params.AddOpt("subscription[resume_date]", subscriptionResumeDate);
+                return this;
+            }
+        }
+        public class ResumeSubscriptionRequest : EntityRequest<ResumeSubscriptionRequest> 
+        {
+            public ResumeSubscriptionRequest(string url, HttpMethod method) 
+                    : base(url, method)
+            {
+            }
+
+            public ResumeSubscriptionRequest ResumeOption(ChargeBee.Models.Enums.ResumeOptionEnum resumeOption) 
+            {
+                m_params.AddOpt("resume_option", resumeOption);
+                return this;
+            }
+            public ResumeSubscriptionRequest ChargesHandling(ChargeBee.Models.Enums.ChargesHandlingEnum chargesHandling) 
+            {
+                m_params.AddOpt("charges_handling", chargesHandling);
+                return this;
+            }
+            public ResumeSubscriptionRequest SubscriptionResumeDate(long subscriptionResumeDate) 
+            {
+                m_params.AddOpt("subscription[resume_date]", subscriptionResumeDate);
                 return this;
             }
         }

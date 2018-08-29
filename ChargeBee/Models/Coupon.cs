@@ -34,6 +34,11 @@ namespace ChargeBee.Models
             string url = ApiUtil.BuildUrl("coupons", CheckNull(id));
             return new EntityRequest<Type>(url, HttpMethod.GET);
         }
+        public static UpdateRequest Update(string id)
+        {
+            string url = ApiUtil.BuildUrl("coupons", CheckNull(id));
+            return new UpdateRequest(url, HttpMethod.POST);
+        }
         public static EntityRequest<Type> Delete(string id)
         {
             string url = ApiUtil.BuildUrl("coupons", CheckNull(id), "delete");
@@ -184,7 +189,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("invoice_name", invoiceName);
                 return this;
             }
-            public CreateRequest DiscountType(DiscountTypeEnum discountType) 
+            public CreateRequest DiscountType(Coupon.DiscountTypeEnum discountType) 
             {
                 m_params.Add("discount_type", discountType);
                 return this;
@@ -210,7 +215,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("discount_quantity", discountQuantity);
                 return this;
             }
-            public CreateRequest ApplyOn(ApplyOnEnum applyOn) 
+            public CreateRequest ApplyOn(Coupon.ApplyOnEnum applyOn) 
             {
                 m_params.Add("apply_on", applyOn);
                 return this;
@@ -235,7 +240,7 @@ namespace ChargeBee.Models
                 m_params.AddOpt("addon_ids", addonIds);
                 return this;
             }
-            public CreateRequest DurationType(DurationTypeEnum durationType) 
+            public CreateRequest DurationType(Coupon.DurationTypeEnum durationType) 
             {
                 m_params.Add("duration_type", durationType);
                 return this;
@@ -265,6 +270,11 @@ namespace ChargeBee.Models
                 m_params.AddOpt("meta_data", metaData);
                 return this;
             }
+            public CreateRequest Status(Coupon.StatusEnum status) 
+            {
+                m_params.AddOpt("status", status);
+                return this;
+            }
         }
         public class CouponListRequest : ListRequestBase<CouponListRequest> 
         {
@@ -281,21 +291,21 @@ namespace ChargeBee.Models
             {
                 return new StringFilter<CouponListRequest>("name", this).SupportsMultiOperators(true);        
             }
-            public EnumFilter<DiscountTypeEnum, CouponListRequest> DiscountType() 
+            public EnumFilter<Coupon.DiscountTypeEnum, CouponListRequest> DiscountType() 
             {
-                return new EnumFilter<DiscountTypeEnum, CouponListRequest>("discount_type", this);        
+                return new EnumFilter<Coupon.DiscountTypeEnum, CouponListRequest>("discount_type", this);        
             }
-            public EnumFilter<DurationTypeEnum, CouponListRequest> DurationType() 
+            public EnumFilter<Coupon.DurationTypeEnum, CouponListRequest> DurationType() 
             {
-                return new EnumFilter<DurationTypeEnum, CouponListRequest>("duration_type", this);        
+                return new EnumFilter<Coupon.DurationTypeEnum, CouponListRequest>("duration_type", this);        
             }
-            public EnumFilter<StatusEnum, CouponListRequest> Status() 
+            public EnumFilter<Coupon.StatusEnum, CouponListRequest> Status() 
             {
-                return new EnumFilter<StatusEnum, CouponListRequest>("status", this);        
+                return new EnumFilter<Coupon.StatusEnum, CouponListRequest>("status", this);        
             }
-            public EnumFilter<ApplyOnEnum, CouponListRequest> ApplyOn() 
+            public EnumFilter<Coupon.ApplyOnEnum, CouponListRequest> ApplyOn() 
             {
-                return new EnumFilter<ApplyOnEnum, CouponListRequest>("apply_on", this);        
+                return new EnumFilter<Coupon.ApplyOnEnum, CouponListRequest>("apply_on", this);        
             }
             public TimestampFilter<CouponListRequest> CreatedAt() 
             {
@@ -307,6 +317,99 @@ namespace ChargeBee.Models
             }
             public CouponListRequest SortByCreatedAt(SortOrderEnum order) {
                 m_params.AddOpt("sort_by["+order.ToString().ToLower()+"]","created_at");
+                return this;
+            }
+        }
+        public class UpdateRequest : EntityRequest<UpdateRequest> 
+        {
+            public UpdateRequest(string url, HttpMethod method) 
+                    : base(url, method)
+            {
+            }
+
+            public UpdateRequest Name(string name) 
+            {
+                m_params.AddOpt("name", name);
+                return this;
+            }
+            public UpdateRequest InvoiceName(string invoiceName) 
+            {
+                m_params.AddOpt("invoice_name", invoiceName);
+                return this;
+            }
+            public UpdateRequest DiscountType(Coupon.DiscountTypeEnum discountType) 
+            {
+                m_params.AddOpt("discount_type", discountType);
+                return this;
+            }
+            public UpdateRequest DiscountAmount(int discountAmount) 
+            {
+                m_params.AddOpt("discount_amount", discountAmount);
+                return this;
+            }
+            public UpdateRequest CurrencyCode(string currencyCode) 
+            {
+                m_params.AddOpt("currency_code", currencyCode);
+                return this;
+            }
+            public UpdateRequest DiscountPercentage(double discountPercentage) 
+            {
+                m_params.AddOpt("discount_percentage", discountPercentage);
+                return this;
+            }
+            public UpdateRequest ApplyOn(Coupon.ApplyOnEnum applyOn) 
+            {
+                m_params.AddOpt("apply_on", applyOn);
+                return this;
+            }
+            public UpdateRequest PlanConstraint(PlanConstraintEnum planConstraint) 
+            {
+                m_params.AddOpt("plan_constraint", planConstraint);
+                return this;
+            }
+            public UpdateRequest AddonConstraint(AddonConstraintEnum addonConstraint) 
+            {
+                m_params.AddOpt("addon_constraint", addonConstraint);
+                return this;
+            }
+            public UpdateRequest PlanIds(List<string> planIds) 
+            {
+                m_params.AddOpt("plan_ids", planIds);
+                return this;
+            }
+            public UpdateRequest AddonIds(List<string> addonIds) 
+            {
+                m_params.AddOpt("addon_ids", addonIds);
+                return this;
+            }
+            public UpdateRequest DurationType(Coupon.DurationTypeEnum durationType) 
+            {
+                m_params.AddOpt("duration_type", durationType);
+                return this;
+            }
+            public UpdateRequest DurationMonth(int durationMonth) 
+            {
+                m_params.AddOpt("duration_month", durationMonth);
+                return this;
+            }
+            public UpdateRequest ValidTill(long validTill) 
+            {
+                m_params.AddOpt("valid_till", validTill);
+                return this;
+            }
+            public UpdateRequest MaxRedemptions(int maxRedemptions) 
+            {
+                m_params.AddOpt("max_redemptions", maxRedemptions);
+                return this;
+            }
+            public UpdateRequest InvoiceNotes(string invoiceNotes) 
+            {
+                m_params.AddOpt("invoice_notes", invoiceNotes);
+                return this;
+            }
+            public UpdateRequest MetaData(JToken metaData) 
+            {
+                m_params.AddOpt("meta_data", metaData);
                 return this;
             }
         }
