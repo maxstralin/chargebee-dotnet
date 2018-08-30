@@ -2559,27 +2559,14 @@ namespace ChargeBee.Models
         #region Subclasses
         public class SubscriptionAddon : Resource
         {
+            public string Id { get => GetValue<string>("id", true); }
 
-            public string Id() {
-                return GetValue<string>("id", true);
-            }
+            public int? Quantity { get => GetValue<int?>("quantity", false); }
+            public int? GetUnitPrice { get => GetValue<int?>("unit_price", false); }
 
-            public int? Quantity() {
-                return GetValue<int?>("quantity", false);
-            }
+            public DateTime? TrialEnd { get => GetDateTime("trial_end", false); }
 
-            public int? UnitPrice() {
-                return GetValue<int?>("unit_price", false);
-            }
-
-            public DateTime? TrialEnd() {
-                return GetDateTime("trial_end", false);
-            }
-
-            public int? RemainingBillingCycles() {
-                return GetValue<int?>("remaining_billing_cycles", false);
-            }
-
+            public int? RemainingBillingCycles { get => GetValue<int?>("remaining_billing_cycles", false); }
         }
         public class SubscriptionCoupon : Resource
         {
